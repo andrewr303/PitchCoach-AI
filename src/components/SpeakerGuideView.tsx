@@ -228,11 +228,11 @@ export default function SpeakerGuideView({ guides, deckTitle, onBack }: SpeakerG
             {/* Keywords */}
             <div className="mb-6">
               <h3 className="text-xs font-semibold text-muted-foreground tracking-wider mb-3">KEYWORDS</h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {guide.keywords.map((keyword, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1.5 rounded-full bg-muted text-foreground text-sm border border-border"
+                    className="px-4 py-2 rounded-full bg-primary/10 text-primary font-semibold text-base border border-primary/20"
                   >
                     {keyword}
                   </span>
