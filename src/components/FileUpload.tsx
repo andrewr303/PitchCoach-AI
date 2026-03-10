@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { Upload, FileText, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
 
 const isValidFile = (file: File) => {
   const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'];
