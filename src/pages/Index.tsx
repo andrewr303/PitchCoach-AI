@@ -8,6 +8,10 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Play, Download, Share2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 
 interface SlideGuideData {
   slideNumber: number;
@@ -41,10 +45,6 @@ const Index = () => {
   const [activeSlide, setActiveSlide] = useState(0);
 
   const extractTextFromPDF = async (file: File): Promise<string[]> => {
-    const pdfjsLib = await import('pdfjs-dist');
-    const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.mjs');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-    
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     
@@ -53,7 +53,7 @@ const Index = () => {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       const text = textContent.items
-        .map((item: any) => item.str)
+        .map((item) => ('str' in item ? item.str : ''))
         .join(' ')
         .trim();
       slideTexts.push(text || `Slide ${i}`);

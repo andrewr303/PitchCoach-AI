@@ -33,8 +33,8 @@ const Login: React.FC = () => {
         if (error) throw error;
         navigate('/');
       }
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }

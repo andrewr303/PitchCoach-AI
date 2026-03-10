@@ -7,7 +7,14 @@ const corsHeaders = {
 };
 
 function sanitizeString(str: string, maxLength: number): string {
-  return String(str).replace(/[\x00-\x1F\x7F]/g, '').trim().slice(0, maxLength);
+  const withoutControlChars = Array.from(String(str))
+    .filter((char) => {
+      const code = char.charCodeAt(0);
+      return code >= 32 && code !== 127;
+    })
+    .join('');
+
+  return withoutControlChars.trim().slice(0, maxLength);
 }
 
 // System prompt embedded from public/ai/system-prompt.txt
