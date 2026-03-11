@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
@@ -46,6 +47,7 @@ const Index = () => {
   const [currentDeck, setCurrentDeck] = useState<Deck | null>(null);
   const [viewingGuide, setViewingGuide] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
+  const { profile } = useUserProfile();
 
   const extractTextFromPDF = async (file: File): Promise<{ texts: string[]; images: string[] }> => {
     const arrayBuffer = await file.arrayBuffer();
@@ -128,8 +130,20 @@ const Index = () => {
 
       setProgress(50);
 
+      // Build user context from profile
+      const userContext: Record<string, string> = {};
+      if (profile.displayName) userContext.presenterName = profile.displayName;
+      if (profile.companyName) userContext.companyName = profile.companyName;
+      if (profile.role) userContext.role = profile.role;
+      if (profile.bio) userContext.bio = profile.bio;
+      if (profile.customInstructions) userContext.customInstructions = profile.customInstructions;
+
       const { data, error } = await supabase.functions.invoke('generate-guide', {
-        body: { slideTexts, deckTitle }
+        body: {
+          slideTexts,
+          deckTitle,
+          ...(Object.keys(userContext).length > 0 ? { userContext } : {}),
+        },
       });
 
       if (error) {

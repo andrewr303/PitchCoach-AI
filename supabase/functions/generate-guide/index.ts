@@ -239,7 +239,7 @@ serve(async (req) => {
 
     // Parse and validate input
     const body = await req.json();
-    const { slideTexts, deckTitle } = body;
+    const { slideTexts, deckTitle, userContext } = body;
 
     if (!deckTitle || typeof deckTitle !== 'string') {
       return new Response(JSON.stringify({ error: 'deckTitle is required and must be a string' }), {
@@ -273,6 +273,32 @@ serve(async (req) => {
 
     console.log(`Generating guides for ${cleanSlides.length} slides`);
 
+    // Build user context supplement for the system prompt
+    let contextSupplement = '';
+    if (userContext && typeof userContext === 'object') {
+      const parts: string[] = [];
+      if (typeof userContext.presenterName === 'string' && userContext.presenterName.trim()) {
+        parts.push(`Presenter name: ${sanitizeString(userContext.presenterName, 100)}`);
+      }
+      if (typeof userContext.companyName === 'string' && userContext.companyName.trim()) {
+        parts.push(`Company: ${sanitizeString(userContext.companyName, 100)}`);
+      }
+      if (typeof userContext.role === 'string' && userContext.role.trim()) {
+        parts.push(`Role: ${sanitizeString(userContext.role, 100)}`);
+      }
+      if (typeof userContext.bio === 'string' && userContext.bio.trim()) {
+        parts.push(`Background: ${sanitizeString(userContext.bio, 500)}`);
+      }
+      if (typeof userContext.customInstructions === 'string' && userContext.customInstructions.trim()) {
+        parts.push(`Custom coaching instructions from the presenter:\n${sanitizeString(userContext.customInstructions, 1000)}`);
+      }
+      if (parts.length > 0) {
+        contextSupplement = `\n\nPresenter Context\n<presenter_context>\n${parts.join('\n')}\n</presenter_context>\n\nUse the presenter context above to tailor your coaching notes — adapt tone, terminology, and focus areas to match the presenter's background and instructions. If custom coaching instructions are provided, follow them while still respecting all other rules and guardrails.`;
+      }
+    }
+
+    const fullSystemPrompt = SYSTEM_PROMPT + contextSupplement;
+
     // Format slide content for the user message
     const slideContent = cleanSlides
       .map((text: string, i: number) => `Slide ${i + 1}: ${text || '(Empty slide)'}`)
@@ -292,7 +318,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
-        system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+        system: [{ type: 'text', text: fullSystemPrompt, cache_control: { type: 'ephemeral' } }],
         messages: [
           { role: 'user', content: userMessage }
         ],
