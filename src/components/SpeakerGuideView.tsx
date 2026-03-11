@@ -325,122 +325,116 @@ export default function SpeakerGuideView({ guides, deckTitle, slideImages, onBac
         {/* Main Content */}
         <main
           ref={mainRef}
-          className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8"
+          className="flex-1 overflow-hidden flex flex-col p-4 md:px-6 md:py-4"
           key={currentSlide}
         >
           <div className={cn(
-            'max-w-4xl mx-auto',
+            'max-w-5xl mx-auto w-full flex flex-col flex-1 min-h-0',
             slideDirection === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'
           )}>
-            {/* Slide header */}
-            <div className="flex items-start justify-between mb-8">
-              <div className="flex-1">
-                <span className="text-overline text-muted-foreground mb-2 block">
+            {/* Slide header — compact row */}
+            <div className="flex items-center justify-between mb-3 flex-shrink-0">
+              <div className="flex items-baseline gap-3 min-w-0">
+                <span className="text-overline text-muted-foreground flex-shrink-0">
                   Slide {currentSlide + 1}
                 </span>
-                <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground leading-tight">
+                <h1 className="text-xl md:text-2xl font-display font-bold text-foreground leading-tight truncate">
                   {guide.title}
                 </h1>
               </div>
-              <div className="flex-shrink-0 ml-4">
-                <div className={cn(
-                  'rounded-xl px-4 py-2.5 text-center border',
-                  timerState === 'over' ? 'bg-destructive/5 border-destructive/20' :
-                  timerState === 'warning' ? 'bg-warning/5 border-warning/20' :
-                  'bg-muted/50 border-border'
-                )}>
-                  <span className="text-overline text-muted-foreground block mb-0.5">Est. Time</span>
-                  <span className={cn('text-lg font-bold font-mono', timerColorClass)}>
-                    {guide.speakerReminder.timing}
-                  </span>
-                </div>
+              <div className={cn(
+                'flex-shrink-0 ml-3 rounded-lg px-3 py-1.5 text-center border',
+                timerState === 'over' ? 'bg-destructive/5 border-destructive/20' :
+                timerState === 'warning' ? 'bg-warning/5 border-warning/20' :
+                'bg-muted/50 border-border'
+              )}>
+                <span className={cn('text-sm font-bold font-mono', timerColorClass)}>
+                  {guide.speakerReminder.timing}
+                </span>
               </div>
             </div>
 
-            {/* Core Message — elevated callout */}
-            <div className="bg-primary/[0.04] border-l-4 border-primary rounded-r-xl p-5 mb-8">
-              <div className="flex items-center gap-2 mb-2">
-                <Lightbulb className="h-4 w-4 text-primary" />
-                <span className="text-overline text-primary uppercase tracking-widest">Core Message</span>
+            {/* Core Message — compact inline callout */}
+            <div className="bg-primary/[0.04] border-l-3 border-primary rounded-r-lg px-4 py-2.5 mb-3 flex-shrink-0">
+              <div className="flex items-start gap-2">
+                <Lightbulb className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                <p className="text-[1.05rem] text-foreground leading-snug font-medium">
+                  {guide.emphasisTopic}
+                </p>
               </div>
-              <p className="text-lg text-foreground leading-relaxed font-medium">
-                {guide.emphasisTopic}
-              </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            {/* Main grid — fills remaining space */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0 overflow-hidden">
               {/* Talking Points — left 2 cols */}
-              <div className="lg:col-span-2">
-                <h3 className="text-overline text-muted-foreground uppercase tracking-widest mb-4">
+              <div className="lg:col-span-2 flex flex-col min-h-0">
+                <h3 className="text-overline text-muted-foreground uppercase tracking-widest mb-2 flex-shrink-0">
                   Talking Points
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2 flex-1 min-h-0 overflow-y-auto custom-scrollbar">
                   {guide.keyTalkingPoints.map((point, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-3 p-3 rounded-xl bg-card border border-border hover:border-primary/15 transition-colors"
+                      className="flex items-start gap-2.5 p-2.5 rounded-lg bg-card border border-border hover:border-primary/15 transition-colors"
                     >
-                      <div className="h-7 w-7 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-bold text-primary-foreground">{i + 1}</span>
+                      <div className="h-6 w-6 rounded-md gradient-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-[11px] font-bold text-primary-foreground">{i + 1}</span>
                       </div>
-                      <p className="text-[1.05rem] text-foreground leading-relaxed pt-0.5">{point}</p>
+                      <p className="text-[1.05rem] text-foreground leading-relaxed">{point}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Right rail — Key Figures + Visual Cue */}
-              <div className="space-y-6">
-                {/* Slide preview */}
-                <div>
-                  <h3 className="text-overline text-muted-foreground uppercase tracking-widest mb-3">
-                    Slide Preview
-                  </h3>
-                  {guide.visualCue && (
-                    <div className="bg-primary/[0.04] border border-primary/15 rounded-xl p-3 mb-3">
-                      <div className="flex items-start gap-2">
-                        <Eye className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-foreground">{guide.visualCue}</p>
-                      </div>
+              {/* Right rail — Visual Cue, Slide Preview, Key Figures, Keywords */}
+              <div className="flex flex-col gap-3 min-h-0 overflow-y-auto custom-scrollbar">
+                {/* Visual Cue */}
+                {guide.visualCue && (
+                  <div className="bg-primary/[0.04] border border-primary/15 rounded-lg p-2.5 flex-shrink-0">
+                    <div className="flex items-start gap-2">
+                      <Eye className="h-3.5 w-3.5 text-primary flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-foreground leading-snug">{guide.visualCue}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Slide preview — compact */}
+                <button
+                  onClick={() => setShowThumbnail(true)}
+                  className="w-full aspect-[16/9] rounded-lg border border-border bg-muted/30 hover:border-primary/30 transition-all duration-200 flex items-center justify-center group overflow-hidden flex-shrink-0"
+                >
+                  {slideImages?.[currentSlide] ? (
+                    <img
+                      src={slideImages[currentSlide]}
+                      alt={`Slide ${currentSlide + 1}`}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="text-center p-3">
+                      <Image className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary/50 mx-auto mb-1 transition-colors" />
+                      <span className="text-[11px] text-muted-foreground/50">Preview</span>
                     </div>
                   )}
-                  <button
-                    onClick={() => setShowThumbnail(true)}
-                    className="w-full aspect-[16/10] rounded-xl border border-border bg-muted/30 hover:border-primary/30 transition-all duration-200 flex items-center justify-center group overflow-hidden"
-                  >
-                    {slideImages?.[currentSlide] ? (
-                      <img
-                        src={slideImages[currentSlide]}
-                        alt={`Slide ${currentSlide + 1}`}
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      <div className="text-center p-4">
-                        <Image className="h-6 w-6 text-muted-foreground/40 group-hover:text-primary/50 mx-auto mb-1.5 transition-colors" />
-                        <span className="text-xs text-muted-foreground/50">Click to preview</span>
-                      </div>
-                    )}
-                  </button>
-                </div>
+                </button>
 
-                {/* Key Figures — stat cards */}
+                {/* Key Figures */}
                 {guide.stats && guide.stats.length > 0 && (
-                  <div>
-                    <h3 className="text-overline text-muted-foreground uppercase tracking-widest mb-3">
+                  <div className="flex-shrink-0">
+                    <h3 className="text-overline text-muted-foreground uppercase tracking-widest mb-1.5">
                       Key Figures
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {guide.stats.map((stat, i) => {
                         const Icon = getStatIcon(stat);
                         return (
                           <div
                             key={i}
-                            className="flex items-start gap-2.5 p-3 rounded-xl bg-secondary/[0.06] border border-secondary/15"
+                            className="flex items-start gap-2 p-2 rounded-lg bg-secondary/[0.06] border border-secondary/15"
                           >
-                            <div className="h-7 w-7 rounded-lg bg-secondary/15 flex items-center justify-center flex-shrink-0">
-                              <Icon className="h-3.5 w-3.5 text-secondary" />
+                            <div className="h-6 w-6 rounded-md bg-secondary/15 flex items-center justify-center flex-shrink-0">
+                              <Icon className="h-3 w-3 text-secondary" />
                             </div>
-                            <span className="text-sm text-foreground font-medium leading-relaxed pt-0.5">
+                            <span className="text-sm text-foreground font-medium leading-snug">
                               {highlightNumbers(stat)}
                             </span>
                           </div>
@@ -449,85 +443,71 @@ export default function SpeakerGuideView({ guides, deckTitle, slideImages, onBac
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
 
-            {/* Keywords */}
-            <div className="mb-8">
-              <h3 className="text-overline text-muted-foreground uppercase tracking-widest mb-3">
-                Keywords
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {guide.keywords.map((keyword, i) => (
-                  <span
-                    key={i}
-                    className="px-3.5 py-1.5 rounded-lg bg-primary/8 text-primary font-semibold text-sm border border-primary/15 hover:bg-primary/12 transition-colors cursor-default"
-                  >
-                    {keyword}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Transition — prominent bridge card */}
-            {currentSlide < totalSlides - 1 && (
-              <div className={cn(
-                'rounded-2xl p-5 md:p-6 transition-all duration-500',
-                // In practice mode, pulse when timer hits 80% of estimated
-                mode === 'practice' && elapsedTime >= estimatedSeconds * 0.8
-                  ? 'bg-secondary/10 border-2 border-secondary/30 shadow-glow-accent'
-                  : 'bg-muted/40 border border-border'
-              )}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex items-center -space-x-1.5">
-                    <ArrowRight className="h-4 w-4 text-secondary" />
-                    <ArrowRight className="h-4 w-4 text-secondary/60" />
+                {/* Keywords — inline in right rail */}
+                <div className="flex-shrink-0">
+                  <h3 className="text-overline text-muted-foreground uppercase tracking-widest mb-1.5">
+                    Keywords
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {guide.keywords.map((keyword, i) => (
+                      <span
+                        key={i}
+                        className="px-2.5 py-1 rounded-md bg-primary/8 text-primary font-semibold text-xs border border-primary/15 cursor-default"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
                   </div>
-                  <span className="text-overline text-secondary uppercase tracking-widest">
-                    Transition to Next Slide
-                  </span>
                 </div>
-                <p className="text-lg text-foreground font-serif italic leading-relaxed">
-                  "{guide.transitionStatement}"
-                </p>
               </div>
-            )}
+            </div>
 
-            {/* Bottom navigation */}
-            <div className="flex items-center justify-center gap-4 mt-10 pt-6 border-t border-border">
-              <button
-                onClick={() => goToSlide(currentSlide - 1)}
-                disabled={currentSlide === 0}
-                className="h-11 w-11 rounded-xl bg-muted flex items-center justify-center disabled:opacity-30 hover:bg-muted/80 transition-all duration-200"
-                aria-label="Previous slide"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-
-              <div className="flex items-center gap-1.5">
-                {guides.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => goToSlide(i)}
-                    className={cn(
-                      'rounded-full transition-all duration-300',
-                      i === currentSlide
-                        ? 'h-2 w-6 gradient-primary'
-                        : 'h-2 w-2 bg-muted hover:bg-muted-foreground/30'
-                    )}
-                    aria-label={`Go to slide ${i + 1}`}
-                  />
-                ))}
+            {/* Bottom bar — transition + navigation, always pinned */}
+            <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border flex-shrink-0">
+              {/* Transition */}
+              <div className="flex-1 min-w-0">
+                {currentSlide < totalSlides - 1 ? (
+                  <div className={cn(
+                    'flex items-start gap-2 rounded-lg px-3 py-2 transition-all duration-500',
+                    mode === 'practice' && elapsedTime >= estimatedSeconds * 0.8
+                      ? 'bg-secondary/10 border border-secondary/30'
+                      : 'bg-muted/40 border border-transparent'
+                  )}>
+                    <ArrowRight className="h-4 w-4 text-secondary flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-foreground font-serif italic leading-snug truncate-2">
+                      "{guide.transitionStatement}"
+                    </p>
+                  </div>
+                ) : (
+                  <div className="px-3 py-2">
+                    <p className="text-sm text-muted-foreground italic">Final slide</p>
+                  </div>
+                )}
               </div>
 
-              <button
-                onClick={() => goToSlide(currentSlide + 1)}
-                disabled={currentSlide === totalSlides - 1}
-                className="h-11 w-11 rounded-xl gradient-primary flex items-center justify-center disabled:opacity-30 hover:shadow-md transition-all duration-200"
-                aria-label="Next slide"
-              >
-                <ChevronRight className="h-5 w-5 text-primary-foreground" />
-              </button>
+              {/* Nav controls */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  onClick={() => goToSlide(currentSlide - 1)}
+                  disabled={currentSlide === 0}
+                  className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center disabled:opacity-30 hover:bg-muted/80 transition-all duration-200"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <span className="text-xs font-mono text-muted-foreground tabular-nums w-12 text-center">
+                  {currentSlide + 1} / {totalSlides}
+                </span>
+                <button
+                  onClick={() => goToSlide(currentSlide + 1)}
+                  disabled={currentSlide === totalSlides - 1}
+                  className="h-9 w-9 rounded-lg gradient-primary flex items-center justify-center disabled:opacity-30 hover:shadow-md transition-all duration-200"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="h-4 w-4 text-primary-foreground" />
+                </button>
+              </div>
             </div>
           </div>
         </main>
