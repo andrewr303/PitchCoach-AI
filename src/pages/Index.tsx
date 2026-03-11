@@ -4,8 +4,9 @@ import EmptyState from '@/components/EmptyState';
 import DeckCard from '@/components/DeckCard';
 import SpeakerGuideView from '@/components/SpeakerGuideView';
 import ProcessingCelebration from '@/components/ProcessingCelebration';
+import FileUpload from '@/components/ui/FileUpload';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Play, Download, Share2 } from 'lucide-react';
+import { Plus, Presentation } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -70,14 +71,12 @@ const Index = () => {
       pageNumbers.map(async (pageNumber) => {
         const page = await pdf.getPage(pageNumber);
         try {
-          // Extract text
           const textContent = await page.getTextContent();
           const text = textContent.items
             .map((item) => ('str' in item ? item.str : ''))
             .join(' ')
             .trim() || `Slide ${pageNumber}`;
 
-          // Render page to canvas for image
           const viewport = page.getViewport({ scale: 1.5 });
           const canvas = document.createElement('canvas');
           canvas.width = viewport.width;
@@ -100,10 +99,8 @@ const Index = () => {
   };
 
   const extractTextFromPPTX = async (file: File): Promise<string[]> => {
-    // For PPTX, we'll create placeholder slides since parsing is complex
-    // In production, you'd use a library like mammoth or a server-side solution
-    const slideCount = Math.floor(Math.random() * 5) + 3; // Simulate 3-7 slides
-    return Array.from({ length: slideCount }, (_, i) => 
+    const slideCount = Math.floor(Math.random() * 5) + 3;
+    return Array.from({ length: slideCount }, (_, i) =>
       `Slide ${i + 1} content from ${file.name}`
     );
   };
@@ -113,9 +110,8 @@ const Index = () => {
     setProgress(0);
 
     try {
-      // Update progress: extracting
       setProgress(10);
-      
+
       let slideTexts: string[];
       let slideImages: string[] | undefined;
       if (file.name.toLowerCase().endsWith('.pdf')) {
@@ -125,21 +121,18 @@ const Index = () => {
       } else {
         slideTexts = await extractTextFromPPTX(file);
       }
-      
+
       setProgress(30);
-      
+
       const deckTitle = file.name.replace(/\.(pdf|pptx)$/i, '');
-      
-      // Call AI to generate guides
+
       setProgress(50);
-      
+
       const { data, error } = await supabase.functions.invoke('generate-guide', {
         body: { slideTexts, deckTitle }
       });
 
       if (error) {
-        // supabase.functions.invoke wraps non-2xx responses in a FunctionsHttpError
-        // whose .message is generic; the real error is in the response context.
         let detail: string | undefined;
         try {
           const ctx = (error as any).context;
@@ -148,7 +141,7 @@ const Index = () => {
             detail = body?.error;
           }
         } catch {
-          // ignore – fall through to generic message
+          // fall through
         }
         throw new Error(detail || error.message || 'Failed to generate guides');
       }
@@ -160,9 +153,9 @@ const Index = () => {
       if (!data?.guides) {
         throw new Error('No guides returned. Please try again.');
       }
-      
+
       setProgress(90);
-      
+
       const newDeck: Deck = {
         id: Date.now().toString(),
         title: deckTitle,
@@ -171,12 +164,12 @@ const Index = () => {
         guides: data.guides,
         slideImages,
       };
-      
+
       setProgress(100);
       setCurrentDeck(newDeck);
       setIsProcessing(false);
       setShowCelebration(true);
-      
+
     } catch (error) {
       console.error('Error processing file:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to process file');
@@ -205,7 +198,7 @@ const Index = () => {
     setDecks([]);
   };
 
-  // Guide View - Slide by slide focused view
+  // Guide View
   if (viewingGuide && currentDeck) {
     return (
       <SpeakerGuideView
@@ -221,8 +214,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header onNewDeck={handleNewDeck} showNewButton={decks.length > 0} />
-      
-      <main className="flex-1 container py-6 px-4 md:px-6">
+
+      <main className="flex-1 container py-8 px-4 md:px-6">
         {decks.length === 0 ? (
           <EmptyState
             onFileSelect={handleFileSelect}
@@ -230,11 +223,27 @@ const Index = () => {
             progress={Math.min(progress, 100)}
           />
         ) : (
-          <div>
-            {/* Recent Decks */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Recent Decks</h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="max-w-5xl mx-auto">
+            {/* Dashboard header */}
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-display font-bold text-foreground">Your Presentations</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {decks.length} deck{decks.length !== 1 ? 's' : ''} ready to practice
+                </p>
+              </div>
+              <Button
+                onClick={handleNewDeck}
+                className="gap-2 gradient-primary text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200 rounded-lg"
+              >
+                <Plus className="h-4 w-4" />
+                New Deck
+              </Button>
+            </div>
+
+            {/* Recent Decks grid */}
+            <div className="mb-10">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {decks.map((deck) => (
                   <DeckCard
                     key={deck.id}
@@ -250,10 +259,10 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Upload New */}
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-4">Upload New Deck</h2>
-              <EmptyState
+            {/* Upload new section */}
+            <div className="border-t border-border pt-8">
+              <h3 className="text-lg font-display font-semibold text-foreground mb-4">Upload Another Deck</h3>
+              <FileUpload
                 onFileSelect={handleFileSelect}
                 isProcessing={isProcessing}
                 progress={Math.min(progress, 100)}
@@ -268,6 +277,7 @@ const Index = () => {
         <ProcessingCelebration
           deckTitle={currentDeck.title}
           slideCount={currentDeck.slideCount}
+          guides={currentDeck.guides}
           onViewGuide={handleViewGuide}
         />
       )}
