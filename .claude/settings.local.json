@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"text-\\\\|bg-\\\\|border-\\\\|shadow\\\\|hover:\" /c/dev/smart-pitch-coach/src/components/*.tsx)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(git status -u)",
+      "Bash(git add src/App.tsx src/pages/Login.tsx src/components/AuthGuard.tsx)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(npm run build)",
+      "Bash(git add supabase/functions/generate-guide/index.ts public/ai/system-prompt.txt)",
+      "Bash(git push origin main)",
+      "Bash(git add index.html)",
+      "Bash(xargs grep:*)",
+      "Bash(npx supabase:*)",
+      "Bash(git add:*)",
+      "Bash(find /c/dev/smart-pitch-coach -type f -name *guide* -o -name *speaker*)",
+      "Bash(find /c/dev/smart-pitch-coach -type f -name *.sql)",
+      "Bash(find /c/dev/smart-pitch-coach/supabase -type f -name *.sql)",
+      "Bash(ls -la /c/dev/smart-pitch-coach/.env*)",
+      "Bash(npm list:*)",
+      "Bash(ls -la /c/dev/smart-pitch-coach/src/*.css)",
+      "Bash(grep -r VITE_ /c/dev/smart-pitch-coach/src --include=*.ts --include=*.tsx)",
+      "Bash(ls -la /c/dev/smart-pitch-coach/dist*)",
+      "Bash(grep -r pdfjs /c/dev/smart-pitch-coach/src --include=*.ts --include=*.tsx)",
+      "Bash(find /c/dev/smart-pitch-coach/public -o -name worker* -type f)",
+      "Bash(grep -r \"worker\" /c/dev/smart-pitch-coach/vite.config.ts /c/dev/smart-pitch-coach/tsconfig*)",
+      "Bash(npm outdated:*)",
+      "Bash(npm audit:*)",
+      "Bash(grep -E \"\\\\.\\(png|svg|jpg|ico\\)$\")",
+      "Bash(grep -r \"title\\\\|name\" /c/dev/smart-pitch-coach --maxdepth 1 --include=\"*.json\" -A 2)",
+      "Bash(git pull:*)"
+    ]
+  }
+}
