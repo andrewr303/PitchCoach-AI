@@ -278,10 +278,18 @@ serve(async (req) => {
       .map((text: string, i: number) => `Slide ${i + 1}: ${text || '(Empty slide)'}`)
       .join('\n\n');
 
-    const userMessage = `<slide_content>\n${slideContent}\n</slide_content>`;
+    const userMessage = `Deck: "${cleanTitle}" (${cleanSlides.length} slides)\n\n<slide_content>\n${slideContent}\n</slide_content>\n\nGenerate the JSON array now.`;
 
-    // Call Anthropic Messages API
+    // Scale max_tokens based on slide count to avoid over-allocation
+    // ~400 tokens per slide is typical; add buffer
+    const estimatedTokens = Math.min(8192, Math.max(2048, cleanSlides.length * 500));
+
+    // Call Anthropic Messages API with optimized settings and timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
+      signal: controller.signal,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -291,13 +299,17 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 8192,
+        max_tokens: estimatedTokens,
+        temperature: 0,
         system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
         messages: [
-          { role: 'user', content: userMessage }
+          { role: 'user', content: userMessage },
+          { role: 'assistant', content: '[' }
         ],
       }),
     });
+
+    clearTimeout(timeout);
 
     if (!response.ok) {
       const errorBody = await response.text();
@@ -326,17 +338,60 @@ serve(async (req) => {
       });
     }
 
-    // Parse the AI response — strip markdown fences defensively
+    // Parse the AI response — prepend the prefilled '[' and strip markdown fences defensively
     let guides;
     try {
-      const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const rawContent = '[' + content;
+      const cleaned = rawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       guides = JSON.parse(cleaned);
     } catch {
-      console.error('Failed to parse AI response as JSON:', content.slice(0, 500));
-      return new Response(JSON.stringify({ error: 'AI response was not valid JSON. Please try again.' }), {
+      // Fallback: try parsing without prepending '[' in case model included it
+      try {
+        const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        guides = JSON.parse(cleaned);
+      } catch {
+        console.error('Failed to parse AI response as JSON:', content.slice(0, 500));
+        return new Response(JSON.stringify({ error: 'AI response was not valid JSON. Please try again.' }), {
+          status: 502,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // Validate response structure
+    if (!Array.isArray(guides)) {
+      console.error('AI response is not an array:', typeof guides);
+      return new Response(JSON.stringify({ error: 'AI response was not in the expected format. Please try again.' }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+
+    // Validate each guide entry has required fields
+    const requiredFields = ['slideNumber', 'title', 'keyTalkingPoints', 'transitionStatement', 'emphasisTopic', 'keywords', 'speakerReminder'];
+    for (let i = 0; i < guides.length; i++) {
+      const guide = guides[i];
+      for (const field of requiredFields) {
+        if (!(field in guide)) {
+          console.error(`Guide entry ${i} missing required field: ${field}`);
+          return new Response(JSON.stringify({ error: `AI response missing required field '${field}' for slide ${i + 1}. Please try again.` }), {
+            status: 502,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+      }
+      // Ensure keyTalkingPoints is an array
+      if (!Array.isArray(guide.keyTalkingPoints)) {
+        guide.keyTalkingPoints = [String(guide.keyTalkingPoints)];
+      }
+      // Ensure keywords is an array
+      if (!Array.isArray(guide.keywords)) {
+        guide.keywords = [];
+      }
+      // Ensure stats is an array
+      if (!Array.isArray(guide.stats)) {
+        guide.stats = [];
+      }
     }
 
     console.log(`Successfully generated ${guides.length} guides`);
@@ -347,6 +402,14 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in generate-guide function:', error);
+
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return new Response(JSON.stringify({ error: 'Request timed out. Try a smaller deck or try again.' }), {
+        status: 504,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     return new Response(JSON.stringify({ error: 'An unexpected error occurred. Please try again.' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

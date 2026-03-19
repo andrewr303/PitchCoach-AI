@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Play, Pause, RotateCcw, X, Image, ArrowRight, Lightbulb, MessageCircle, Eye, DollarSign, Percent, TrendingUp, Calendar, BarChart3, type LucideIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Pause, RotateCcw, X, Image, ArrowRight, Lightbulb, MessageCircle, Eye, DollarSign, Percent, TrendingUp, Calendar, BarChart3, PanelLeftClose, PanelLeftOpen, type LucideIcon } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SlideGuideData {
   slideNumber: number;
@@ -57,10 +58,17 @@ const getSlideCategory = (slideNumber: number, total: number): string => {
 };
 
 export default function SpeakerGuideView({ guides, deckTitle, slideImages, onBack }: SpeakerGuideViewProps) {
+  const isMobile = useIsMobile();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showThumbnail, setShowThumbnail] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Collapse sidebar by default on mobile, expand on desktop
+  useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
 
   const guide = guides[currentSlide];
   const totalSlides = guides.length;
@@ -139,21 +147,50 @@ export default function SpeakerGuideView({ guides, deckTitle, slideImages, onBac
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Sidebar Toggle Button */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="absolute top-3 left-3 z-30 h-8 w-8 rounded-lg bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors shadow-sm"
+          aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+          title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+        >
+          {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
+        </button>
+
+        {/* Mobile overlay backdrop */}
+        {isMobile && sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-background/60 backdrop-blur-sm z-20"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Sidebar */}
-        <aside className="w-56 border-r border-border bg-card overflow-y-auto flex-shrink-0">
-          <div className="p-4 border-b border-border flex items-center justify-between">
+        <aside
+          className={`border-r border-border bg-card overflow-y-auto flex-shrink-0 transition-all duration-300 ease-in-out z-20 ${
+            sidebarOpen
+              ? isMobile
+                ? 'fixed inset-y-0 left-0 w-64 top-[57px] shadow-xl'
+                : 'w-56'
+              : 'w-0 overflow-hidden border-r-0'
+          }`}
+        >
+          <div className="p-4 pt-14 border-b border-border flex items-center justify-between min-w-[14rem]">
             <span className="text-sm font-medium text-muted-foreground">SLIDES</span>
             <span className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">{currentSlide + 1}/{totalSlides}</span>
           </div>
-          <div className="p-2">
+          <div className="p-2 min-w-[14rem]">
             {guides.map((g, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentSlide(index)}
+                onClick={() => {
+                  setCurrentSlide(index);
+                  if (isMobile) setSidebarOpen(false);
+                }}
                 className={`w-full text-left p-3 rounded-lg mb-1 transition-colors ${
-                  currentSlide === index 
-                    ? 'bg-primary/10 border border-primary/30' 
+                  currentSlide === index
+                    ? 'bg-primary/10 border border-primary/30'
                     : 'hover:bg-muted'
                 }`}
               >
@@ -170,7 +207,7 @@ export default function SpeakerGuideView({ guides, deckTitle, slideImages, onBac
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className={`flex-1 overflow-y-auto p-6 ${!sidebarOpen ? 'pl-14' : ''}`}>
           {/* Progress Bar */}
           <div className="h-1 bg-muted rounded-full mb-6 overflow-hidden">
             <div 
