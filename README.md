@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/pitchcoachAIlogo.png" alt="PitchCoach AI" width="420" />
+<img src="public/pitchcoachAIlogo.jpg" alt="PitchCoach AI" width="420" />
 
 <br /><br />
 
@@ -10,14 +10,14 @@ Upload a PDF or PPTX. Get instant, structured coaching — talking points, trans
 
 [![Live App](https://img.shields.io/badge/Live%20App-pitchcoach.founderpilot.ai-6366f1?style=flat-square&logo=vercel)](https://pitchcoach.founderpilot.ai)
 [![Demo](https://img.shields.io/badge/Demo-guide--my--pitch.lovable.app-0ea5e9?style=flat-square&logo=globe)](https://guide-my-pitch.lovable.app)
-[![Stack](https://img.shields.io/badge/Stack-React%20%2B%20Supabase%20%2B%20Claude-f59e0b?style=flat-square)](https://github.com/andrewr303/smart-pitch-coach)
+[![Stack](https://img.shields.io/badge/Stack-React%20%2B%20Supabase%20%2B%20Claude-f59e0b?style=flat-square)](https://github.com/andrewr303/PitchCoach-AI)
 
 </div>
 
 ---
 
 <p align="center">
-  <img src="screenshot.jpeg" alt="PitchCoach AI Screenshot" width="780" />
+  <img src="public/platform-full-screenshot.png" alt="PitchCoach AI — Speaker guide presenter view" width="780" />
 </p>
 
 ---
@@ -44,6 +44,30 @@ The result is a keyboard-navigable presenter view — think teleprompter meets s
 - **Keyboard navigation** — `←` / `→` to move between slides, `Space` to toggle the timer, `Esc` to return to the dashboard.
 - **Slide thumbnail sidebar** — Scrollable overview of all slides with instant jump-to navigation.
 - **Deck history** — Dashboard keeps all previously processed decks accessible.
+
+---
+
+## Screenshots
+
+<p align="center">
+  <img src="public/guide-is-ready-graphic.png" alt="Guide ready — stats summary" width="420" />
+</p>
+<p align="center"><sub><b>Guide generated</b> — instant stats summary showing slides analyzed, talking points, and transitions</sub></p>
+
+<br />
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="public/slide-closeup.png" alt="Slide detail — core message and talking points" /><br/>
+      <sub><b>Slide detail</b> — core message, 3 talking points, key figures, and transition statement</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="public/talking-points.png" alt="Talking points close-up" /><br/>
+      <sub><b>Talking points</b> — concrete, slide-specific coaching derived from your actual content</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -96,7 +120,7 @@ Each slide in the output conforms to a strict schema: title, 3 talking points, t
 ## Repository Structure
 
 ```
-smart-pitch-coach/
+PitchCoach-AI/
 ├── src/
 │   ├── components/
 │   │   ├── ui/                   # 50+ Shadcn/UI primitives
@@ -125,7 +149,7 @@ smart-pitch-coach/
 │           └── index.ts          # Deno edge function (AI orchestration)
 ├── public/
 │   ├── ai/system-prompt.txt      # Claude system prompt
-│   └── pitchcoachAIlogo.png
+│   └── pitchcoachAIlogo.jpg
 ├── vite.config.ts
 ├── tailwind.config.ts
 └── package.json
@@ -145,8 +169,8 @@ smart-pitch-coach/
 
 ```bash
 # Clone the repository
-git clone https://github.com/andrewr303/smart-pitch-coach.git
-cd smart-pitch-coach
+git clone https://github.com/andrewr303/PitchCoach-AI.git
+cd PitchCoach-AI
 
 # Install dependencies
 npm install
