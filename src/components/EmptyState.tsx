@@ -48,7 +48,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-slide-up" style={{
         animationDelay: '0.2s'
       }}>
-          {features.map((feature, index) => <div key={feature.title} className="p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-all duration-300 hover:shadow-md">
+          {features.map((feature, index) => <div key={feature.title} className="p-4 rounded-2xl glass-effect transition-all duration-300 hover:shadow-xl hover:border-primary/50">
               <div className="h-10 w-10 rounded-lg bg-secondary/10 flex items-center justify-center mb-3">
                 <feature.icon className="h-5 w-5 text-secondary" />
               </div>

@@ -93,10 +93,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
   if (isProcessing) {
     return (
       <div className={cn('w-full', className)}>
-        <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-8">
+        <div className="rounded-2xl glass-effect border-primary/30 bg-primary/5 p-8">
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center animate-pulse-glow">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
                 <Loader2 className="h-8 w-8 text-primary animate-spin" />
               </div>
             </div>
@@ -124,7 +124,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   if (selectedFile && !isProcessing) {
     return (
       <div className={cn('w-full', className)}>
-        <div className="rounded-xl border-2 border-success/30 bg-success/5 p-6">
+        <div className="rounded-2xl glass-effect border-success/30 bg-success/5 p-6">
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-lg bg-success/20 flex items-center justify-center">
               <FileText className="h-6 w-6 text-success" />
@@ -153,10 +153,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onDragOver={handleDrag}
         onDrop={handleDrop}
         className={cn(
-          'relative flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-8 cursor-pointer transition-all duration-200',
+          'relative flex flex-col items-center justify-center gap-4 rounded-2xl glass-effect p-8 cursor-pointer transition-all duration-300',
           isDragOver
-            ? 'border-secondary bg-secondary/10 scale-[1.02]'
-            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+            ? 'border-secondary bg-secondary/10 shadow-[0_0_40px_rgba(24,95,53,0.3)] scale-[1.02]'
+            : 'border border-dashed border-white/20 hover:border-primary/50 hover:shadow-xl'
         )}
       >
         <input

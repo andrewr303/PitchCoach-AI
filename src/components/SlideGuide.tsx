@@ -49,10 +49,10 @@ const SlideGuide: React.FC<SlideGuideProps> = ({
     <div
       onClick={onClick}
       className={cn(
-        'rounded-xl border bg-card p-5 transition-all duration-300 cursor-pointer',
+        'rounded-2xl glass-effect p-5 transition-all duration-300 cursor-pointer',
         isActive
           ? 'border-primary shadow-lg ring-2 ring-primary/20'
-          : 'border-border hover:border-primary/30 hover:shadow-md',
+          : 'border-white/10 hover:border-primary/50 hover:shadow-xl',
         className
       )}
     >
