@@ -99,9 +99,13 @@ export default function SpeakerGuideView({ guides, deckTitle, slideImages, onBac
   }, [currentSlide, isPlaying, onBack, goToSlide]);
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-background relative overflow-hidden">
+      {/* Decorative blurred background elements for liquid glass look */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/20 blur-[120px] pointer-events-none" />
+
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-card flex-shrink-0">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-white/10 glass-effect flex-shrink-0 z-10">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
@@ -139,10 +143,10 @@ export default function SpeakerGuideView({ guides, deckTitle, slideImages, onBac
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative z-10">
         {/* Sidebar */}
-        <aside className="w-56 border-r border-border bg-card overflow-y-auto flex-shrink-0">
-          <div className="p-4 border-b border-border flex items-center justify-between">
+        <aside className="w-56 border-r border-white/10 glass-effect overflow-y-auto flex-shrink-0">
+          <div className="p-4 border-b border-white/10 flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">SLIDES</span>
             <span className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">{currentSlide + 1}/{totalSlides}</span>
           </div>
@@ -193,12 +197,13 @@ export default function SpeakerGuideView({ guides, deckTitle, slideImages, onBac
             </div>
 
             {/* Core Message */}
-            <div className="bg-card border-l-4 border-success rounded-lg p-5 mb-6">
-              <div className="flex items-center gap-2 text-success mb-2">
+            <div className="glass-effect border-l-4 border-success rounded-2xl p-6 mb-6 relative overflow-hidden">
+              <div className="absolute inset-0 bg-success/5 pointer-events-none" />
+              <div className="flex items-center gap-2 text-success mb-2 relative">
                 <Lightbulb className="h-4 w-4" />
                 <span className="text-xs font-semibold tracking-wider">CORE MESSAGE</span>
               </div>
-              <p className="text-lg text-foreground">{guide.emphasisTopic}</p>
+              <p className="text-lg text-foreground relative">{guide.emphasisTopic}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -337,7 +342,7 @@ export default function SpeakerGuideView({ guides, deckTitle, slideImages, onBac
             >
               <X className="h-5 w-5" />
             </button>
-            <div className="bg-card rounded-xl p-4 border border-border shadow-xl">
+            <div className="glass-effect rounded-2xl p-4 border border-white/10 shadow-xl">
               {slideImages?.[currentSlide] ? (
                 <img
                   src={slideImages[currentSlide]}

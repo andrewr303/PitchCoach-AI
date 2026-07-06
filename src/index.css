@@ -161,7 +161,12 @@ All colors MUST be HSL.
   }
 
   .glass-effect {
-    @apply backdrop-blur-md bg-card/80;
+    @apply backdrop-blur-xl bg-background/60 border border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)];
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .dark .glass-effect {
+    @apply bg-background/40 border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)];
   }
 
   .text-gradient {
