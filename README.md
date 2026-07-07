@@ -8,7 +8,7 @@
 
 Upload a PDF or PPTX. Get instant, structured coaching — talking points, transitions, timing cues, and stage directions — so you can present with confidence.
 
-[![Live App](https://img.shields.io/badge/Live%20App-pitchcoach.founderpilot.ai-6366f1?style=flat-square&logo=vercel)](https://pitchcoach.founderpilot.ai)
+[![Live App](https://img.shields.io/badge/Live%20App-pitchcoach.andrewvrodriguez.com-6366f1?style=flat-square&logo=vercel)](https://pitchcoach.andrewvrodriguez.com/)
 
 </div>
 
@@ -256,9 +256,3 @@ Contributions are welcome. To get started:
 4. Push to your fork and open a pull request
 
 Please keep PRs focused — one feature or fix per PR makes review faster.
-
----
-
-## License
-
-See [LICENSE](LICENSE) for details.
