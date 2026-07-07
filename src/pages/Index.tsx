@@ -4,6 +4,7 @@ import EmptyState from '@/components/EmptyState';
 import DeckCard from '@/components/DeckCard';
 import SpeakerGuideView from '@/components/SpeakerGuideView';
 import ProcessingCelebration from '@/components/ProcessingCelebration';
+import { AI_CONTEXT_STORAGE_KEY } from '@/components/UserSettingsDialog';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Play, Download, Share2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -134,7 +135,11 @@ const Index = () => {
       setProgress(50);
       
       const { data, error } = await supabase.functions.invoke('generate-guide', {
-        body: { slideTexts, deckTitle }
+        body: {
+          slideTexts,
+          deckTitle,
+          userContext: localStorage.getItem(AI_CONTEXT_STORAGE_KEY) ?? '',
+        }
       });
 
       if (error) {
@@ -142,10 +147,10 @@ const Index = () => {
         // whose .message is generic; the real error is in the response context.
         let detail: string | undefined;
         try {
-          const ctx = (error as any).context;
+          const ctx = 'context' in error ? error.context : undefined;
           if (ctx instanceof Response) {
-            const body = await ctx.json();
-            detail = body?.error;
+            const body = await ctx.json() as { error?: string };
+            detail = body.error;
           }
         } catch {
           // ignore – fall through to generic message

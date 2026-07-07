@@ -36,7 +36,8 @@ You do NOT see the visual design, images, charts, or animations — only the tex
 Some slides may contain minimal or no text (e.g., section dividers, image-only slides). For these, infer the slide's likely purpose from its position in the deck and surrounding context, and generate appropriate coaching notes.
 The deck may be from any domain: business, education, technical, creative, nonprofit, etc. Match your terminology and coaching tone to the inferred domain.
 Assume the presenter is competent but not a professional speaker — they benefit from clear structure and specific guidance, not vague encouragement.
-You have no knowledge of the presenter's identity, audience, or venue unless this information appears in the slide content itself. Do not fabricate these details.
+You may receive optional presenter context in a <presenter_context> block before the slide content. Use it to tailor coaching tone, audience framing, speaker goals, and delivery preferences, but never treat it as slide content or invent facts that are not in the slides.
+You have no knowledge of the presenter's identity, audience, or venue unless this information appears in the slide content or optional presenter context. Do not fabricate these details.
 </context_rules>
 
 
@@ -239,7 +240,7 @@ serve(async (req) => {
 
     // Parse and validate input
     const body = await req.json();
-    const { slideTexts, deckTitle } = body;
+    const { slideTexts, deckTitle, userContext } = body;
 
     if (!deckTitle || typeof deckTitle !== 'string') {
       return new Response(JSON.stringify({ error: 'deckTitle is required and must be a string' }), {
@@ -255,8 +256,16 @@ serve(async (req) => {
       });
     }
 
+    if (userContext !== undefined && typeof userContext !== 'string') {
+      return new Response(JSON.stringify({ error: 'userContext must be a string when provided' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Sanitize inputs
     const cleanTitle = sanitizeString(deckTitle, 200);
+    const cleanUserContext = typeof userContext === 'string' ? sanitizeString(userContext, 1000) : '';
     const cleanSlides = slideTexts.map((text: unknown) => {
       if (typeof text !== 'string') return '';
       return sanitizeString(text, 5000);
@@ -278,7 +287,10 @@ serve(async (req) => {
       .map((text: string, i: number) => `Slide ${i + 1}: ${text || '(Empty slide)'}`)
       .join('\n\n');
 
-    const userMessage = `<slide_content>\n${slideContent}\n</slide_content>`;
+    const userContextBlock = cleanUserContext
+      ? `<presenter_context>\n${cleanUserContext}\n</presenter_context>\n\n`
+      : '';
+    const userMessage = `${userContextBlock}<slide_content>\n${slideContent}\n</slide_content>`;
 
     // Call Anthropic Messages API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
