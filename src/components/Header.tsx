@@ -1,6 +1,7 @@
 import React from 'react';
-import { Plus, User, Settings } from 'lucide-react';
+import { Plus, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import UserSettingsDialog from '@/components/UserSettingsDialog';
 
 interface HeaderProps {
   onNewDeck?: () => void;
@@ -24,12 +25,16 @@ const Header: React.FC<HeaderProps> = ({ onNewDeck, showNewButton = true }) => {
               <span className="hidden sm:inline">New Deck</span>
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-            <Settings className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-            <User className="h-5 w-5" />
-          </Button>
+          <UserSettingsDialog>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Open settings"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          </UserSettingsDialog>
         </div>
       </div>
     </header>
